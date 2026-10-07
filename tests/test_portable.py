@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import os
 import pwd
+import subprocess
 from unittest.mock import patch
 import tempfile
 import unittest
@@ -91,6 +92,10 @@ class Portable(unittest.TestCase):
         self.assertNotIn('tailscaled.service', hardware.SYSTEM_UNITS)
         self.assertNotIn('windscribe.service', hardware.SYSTEM_UNITS)
         self.assertNotIn('gnome-remote-desktop.service', hardware.SYSTEM_UNITS)
+
+    def test_optional_reader_timeout_allows_red_ok(self):
+        with patch.object(installer.subprocess, "run", side_effect=subprocess.TimeoutExpired("fprintd-list",10)):
+            self.assertFalse(installer.fingerprint_enrolled("demo"))
 
     def test_extension_array_rejects_code(self):
         self.assertEqual(installer.enabled_extensions('@as []'), [])

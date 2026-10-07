@@ -107,6 +107,15 @@ def verify_platform() -> None:
         raise ValueError("Controlador cpuset/cgroupv2 necessário.")
 
 
+def fingerprint_enrolled(username: str) -> bool:
+    try:
+        fingers = subprocess.run(["fprintd-list", username], capture_output=True, text=True,
+                                 timeout=10, env={**os.environ, "LC_ALL": "C"})
+    except subprocess.TimeoutExpired:
+        return False
+    return not fingers.returncode and bool(re.search(r"(?m)^\s*-[ ]*#[0-9]+:", fingers.stdout))
+
+
 def doctor(user: pwd.struct_passwd, offline: bool, containers: bool) -> Report:
     verify_platform()
     bus = dbus.SystemBus()
@@ -121,9 +130,7 @@ def doctor(user: pwd.struct_passwd, offline: bool, containers: bool) -> Report:
     battery = dbus.Interface(bus.get_object("org.freedesktop.UPower", "/org/freedesktop/UPower/devices/DisplayDevice"), "org.freedesktop.DBus.Properties")
     if int(battery.Get("org.freedesktop.UPower.Device", "Type")) != 2 or not battery.Get("org.freedesktop.UPower.Device", "IsPresent"):
         raise ValueError("Bateria de portátil não detectada pelo UPower.")
-    fingers = subprocess.run(["fprintd-list", user.pw_name], capture_output=True, text=True,
-                             timeout=10, env={**os.environ, "LC_ALL": "C"})
-    enrolled = not fingers.returncode and bool(re.search(r"(?m)^\s*-[ ]*#[0-9]+:", fingers.stdout))
+    enrolled = fingerprint_enrolled(user.pw_name)
     # Do not install a second coordinator beside the host-specific pilot/TLP.
     for unit in ("thinkpad-power-ac", "tlp", "tuned", "auto-cpufreq"):
         if subprocess.run(["systemctl", "is-active", unit], capture_output=True).returncode == 0:

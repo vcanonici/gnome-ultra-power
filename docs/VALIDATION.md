@@ -4,7 +4,7 @@ Data: 2026-10-07. Esta lista distingue testes do pacote público e a referência
 
 ## Pacote público
 
-- **51 testes**: configuração estrita, descoberta de topologia híbrida/SMT/um núcleo e IDs diferentes, recuperação, proteção de processos, revisão de PID/pidfd, cpufreq inativa/EBUSY e instalador.
+- **52 testes**: configuração estrita, descoberta de topologia híbrida/SMT/um núcleo e IDs diferentes, recuperação, proteção de processos, revisão de PID/pidfd, cpufreq inativa/EBUSY e instalador.
 - **mypy strict** aprovado em nove arquivos Python, com stubs para D-Bus.
 - Sintaxe ESModule da extensão, metadata JSON e unidade systemd verificadas.
 - Regressão de permissão: biblioteca legível pela sessão (0755) e módulos 0644 mesmo com umask 077; manifesto privado 0700.

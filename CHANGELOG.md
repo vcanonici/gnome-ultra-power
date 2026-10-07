@@ -8,7 +8,7 @@
 - Mesmas verificações de UID, sessão, bateria, processos protegidos e journal para ambos os caminhos.
 - Instalação permitida sem digital cadastrada; leitores continuam opcionais para aprovação biométrica.
 - Evita autoativação D-Bus e espera por Bluetooth ausente.
-- 51 testes e mypy strict; teste gráfico do botão e de troca de aprovação na VM.
+- 52 testes e mypy strict; teste gráfico do botão e de troca de aprovação na VM.
 
 ## 1.0.0 — 2026-10-07
 
