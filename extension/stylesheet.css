@@ -3,3 +3,6 @@
 .ultra-dialog-title { font-size: 1.3em; font-weight: bold; }
 .ultra-dialog-body { max-width: 34em; }
 .ultra-dialog-icon { icon-size: 64px; margin-bottom: 16px; }
+.modal-dialog-linked-button.ultra-approve-ok { background-color: #c01c28; color: #ffffff; font-weight: bold; }
+.modal-dialog-linked-button.ultra-approve-ok:hover { background-color: #e01b24; }
+.modal-dialog-linked-button.ultra-approve-ok:focus { background-color: #c01c28; box-shadow: inset 0 0 0 2px #ffffff; }

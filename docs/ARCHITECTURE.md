@@ -3,7 +3,8 @@
 ```mermaid
 flowchart LR
   Menu[Menu de energia GNOME 46] -->|D-Bus / UID local| Daemon[Serviço ULTRA root]
-  Daemon -->|nova aprovação| PAM[PAM ultra-power / fprintd]
+  Daemon -->|opção digital| PAM[PAM ultra-power / fprintd]
+  Daemon -->|OK vermelho| Journal
   PAM -->|digital aprovada| Journal[Journal privado de recuperação]
   Journal --> CPU[CPU / afinidade / runtime PM]
   Journal --> Session[Agente da sessão do usuário]
@@ -13,7 +14,7 @@ flowchart LR
 
 A extensão usa a integração de energia do GNOME 46. Essas APIs incluem objetos internos do Shell; por isso a versão é limitada e extensões que modificam o mesmo menu podem conflitar. [Documentação do GNOME](https://gjs.guide/extensions/development/creating.html).
 
-O serviço aceita somente a conta configurada, sessão local em seat0, Wayland, desbloqueada e na bateria. root pode pedir recuperação, mas não ativar. A digital passa por um serviço PAM separado com três tentativas e timeout. Uma desconexão do cliente ou bloqueio da sessão cancela uma aprovação pendente.
+O serviço aceita somente a conta configurada, sessão local em seat0, Wayland, desbloqueada e na bateria. root pode pedir recuperação, mas não ativar. O OK vermelho é uma alternativa explícita à biometria para confirmar os compromissos e evitar ativação acidental. A digital passa por um serviço PAM separado com três tentativas e timeout. Uma desconexão do cliente ou bloqueio da sessão cancela uma aprovação pendente.
 
 Configuração e recuperação têm validação de tipos e listas restritas de caminhos/serviços. O journal é gravado atomicamente, com fsync e modo 0600 num diretório 0700, antes das mudanças. Ajustes transitórios de cgroup e máscaras de serviços usam `--runtime`. Reiniciar não reativa ULTRA.
 
@@ -35,7 +36,7 @@ A versão pública não modifica drivers nem aplica a regra Intel específica do
 
 ## Instalação
 
-`doctor` recusa versões sem suporte, ausência de bateria/digital e coordenadores concorrentes. O instalador não sobrescreve destinos existentes, preserva outras extensões e registra hashes dos arquivos PAM de login/sudo para verificar que permaneceram intactos.
+`doctor` recusa versões sem suporte, ausência de bateria e coordenadores concorrentes. O instalador não sobrescreve destinos existentes, preserva outras extensões e registra hashes dos arquivos PAM de login/sudo para verificar que permaneceram intactos.
 
 O serviço root fica em `/usr/local/lib/ultra-power`; a extensão pertence ao usuário em `~/.local/share/gnome-shell/extensions/ultra-power@vcanonici`. O manifesto fica em `/var/lib/ultra-power-install`, com acesso root. D-Bus: `io.github.vcanonici.UltraPower`; unidade: `ultra-power.service`.
 

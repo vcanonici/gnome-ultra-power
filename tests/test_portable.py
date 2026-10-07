@@ -73,6 +73,20 @@ class Portable(unittest.TestCase):
             result=detect(1001,root=root); result['lab']=True
             with self.assertRaises(ValueError): config(result)
 
+    def test_missing_bluetooth_never_starts_optional_service(self):
+        from unittest.mock import Mock
+        hw=hardware.Hardware.__new__(hardware.Hardware)
+        hw.config={'uid':1001,'presets':{'minimal':{'online':[0],'session':[0]},'responsive':{'online':[0],'session':[0]}}}
+        hw.uid=1001; hw.bus=Mock(); hw.bus.name_has_owner.return_value=False
+        hw.battery=Mock(return_value=True);hw.local_session=Mock(return_value=True)
+        hw.knob_paths=Mock(return_value=[]);hw.profile=Mock(return_value='balanced')
+        with tempfile.TemporaryDirectory() as tmp, patch.object(hardware,'STATE',Path(tmp)/'state'), \
+             patch.object(hardware,'run',return_value=''), \
+             patch.object(hardware,'agent',return_value={'brightness':-1,'units':[]}):
+            state=hw.snapshot()
+        self.assertEqual(state['blue'],[])
+        hw.bus.get_object.assert_not_called()
+
     def test_no_vpn_or_global_remote_login_stopped(self):
         self.assertNotIn('tailscaled.service', hardware.SYSTEM_UNITS)
         self.assertNotIn('windscribe.service', hardware.SYSTEM_UNITS)

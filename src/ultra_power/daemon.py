@@ -128,17 +128,15 @@ class Service(dbus.service.Object):
             raise Error("Exige sessão local desbloqueada.")
         return consumers(int(self.config["uid"]))
 
-    @dbus.service.method(
-        IFACE, in_signature="bas", out_signature="", sender_keyword="sender"
-    )
-    def RequestEnable(
+    def _validate_request(
         self,
-        force: bool = False,
-        reviewed: list[str] | tuple[str, ...] = (),
-        sender: str | None = None,
-    ) -> None:
+        force: bool,
+        reviewed: list[str] | tuple[str, ...],
+        sender: str | None,
+        replace_pending: bool = False,
+    ) -> tuple[str, ...]:
         self.check(sender)
-        if self.active or self.pending or self.applying or STATE.exists():
+        if self.active or self.applying or STATE.exists() or (self.pending and (not replace_pending or self.owner != sender)):
             raise Error("Operacao em curso ou recuperacao pendente.")
         if (
             not self.hardware.battery()
@@ -152,13 +150,29 @@ class Service(dbus.service.Object):
             raise Error(
                 "Lista de processos mudou ou inclui servidor grafico; cancelado."
             )
-        reviewed = tuple(map(str, reviewed))
+        return tuple(map(str, reviewed))
+
+    @dbus.service.method(IFACE, in_signature="bas", out_signature="", sender_keyword="sender")
+    def ConfirmEnable(self, force: bool = False, reviewed: list[str] | tuple[str, ...] = (), sender: str | None = None) -> None:
+        """Explicit red-OK alternative, under the same local-session safeguards."""
+        tokens = self._validate_request(force, reviewed, sender, replace_pending=True)
+        if self.pending:
+            self.cancel()
+        self.epoch += 1
+        self.owner = sender
+        self.error = ""
+        self.message = ""
+        self.job("enter", token=self.epoch, reviewed=tokens if force else None)
+
+    @dbus.service.method(IFACE, in_signature="bas", out_signature="", sender_keyword="sender")
+    def RequestEnable(self, force: bool = False, reviewed: list[str] | tuple[str, ...] = (), sender: str | None = None) -> None:
+        reviewed = self._validate_request(force, reviewed, sender)
         self.epoch += 1
         token = self.epoch
         self.owner = sender
         self.error = ""
         self.pending = True
-        self.message = "Coloque o indicador no leitor de impressão digital."
+        self.message = "Coloque o dedo cadastrado no leitor ou confirme no OK vermelho."
         username = pwd.getpwuid(int(self.config["uid"])).pw_name
         self.child = subprocess.Popen(
             ["/usr/bin/python3", str(HERE / "pam_finger.py"), username],

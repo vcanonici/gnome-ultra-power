@@ -102,6 +102,7 @@ class Activation(unittest.TestCase):
         obj.hardware.local_session.return_value = True
         obj.active = obj.pending = obj.applying = False
         obj.epoch = 0
+        obj._validate_request = lambda *args, **kwargs: Service._validate_request(obj, *args, **kwargs)
         return obj
 
     def test_ac_rejected_before_gpu_inventory(self):

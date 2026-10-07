@@ -1,11 +1,11 @@
 {
   "uuid": "ultra-power@vcanonici",
   "name": "GNOME ULTRA Power",
-  "description": "Mais bateria, ativa\u00e7\u00e3o por digital e recupera\u00e7\u00e3o autom\u00e1tica.",
+  "description": "Economia de bateria, confirmação por digital ou OK vermelho e recuperação automática.",
   "shell-version": [
     "46"
   ],
-  "version": 1,
+  "version": 2,
   "session-modes": [
     "user",
     "unlock-dialog"

@@ -202,6 +202,8 @@ class Hardware:
         )
         blue = []
         try:
+            if not self.bus.name_has_owner("org.bluez"):
+                raise dbus.DBusException("Bluetooth indisponível.")
             objects = dbus.Interface(
                 self.bus.get_object("org.bluez", "/", introspect=False),
                 "org.freedesktop.DBus.ObjectManager",

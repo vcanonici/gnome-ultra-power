@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
-<title id="title">GNOME ULTRA Power</title><desc id="desc">Bateria primeiro. Digital para ativar. Controle para voltar.</desc>
+<title id="title">GNOME ULTRA Power</title><desc id="desc">Bateria primeiro. Digital ou OK para ativar. Controle para voltar.</desc>
 <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101b27"/><stop offset="1" stop-color="#203b40"/></linearGradient><linearGradient id="cell"><stop stop-color="#fde047"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs>
 <rect width="1280" height="420" rx="24" fill="url(#bg)"/>
 <circle cx="1130" cy="60" r="240" fill="#94d4b0" opacity=".06"/>
 <g font-family="sans-serif"><text x="72" y="88" fill="#a7d9cb" font-size="18" letter-spacing="4">GNOME · LINUX · OPEN SOURCE</text>
 <text x="68" y="192" fill="#f8fafc" font-size="78" font-weight="800">ULTRA <tspan fill="#fde047">Power</tspan></text>
-<text x="72" y="250" fill="#e2e8f0" font-size="27">Bateria primeiro. Digital para ativar.</text>
+<text x="72" y="250" fill="#e2e8f0" font-size="27">Bateria primeiro. Digital ou OK para ativar.</text>
 <text x="72" y="290" fill="#e2e8f0" font-size="27">Controle para voltar.</text>
 <rect x="72" y="333" width="326" height="39" rx="19" fill="#324e51"/>
 <text x="94" y="359" fill="#f8fafc" font-size="18">Ubuntu 24.04 · GNOME 46 · Wayland</text></g>

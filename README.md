@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/assets/banner.svg" alt="GNOME ULTRA Power — bateria primeiro, digital para ativar" width="100%"></p>
+<p align="center"><img src="docs/assets/banner.svg" alt="GNOME ULTRA Power — bateria primeiro, digital ou OK para ativar" width="100%"></p>
 
 <p align="center">
 <a href="https://github.com/vcanonici/gnome-ultra-power/actions/workflows/ci.yml"><img src="https://github.com/vcanonici/gnome-ultra-power/actions/workflows/ci.yml/badge.svg" alt="Checks"></a>
@@ -7,11 +7,11 @@
 <img src="https://img.shields.io/badge/GNOME-46-4a86cf" alt="GNOME 46">
 </p>
 
-Um modo de economia dedicado a **Brave, terminal e tarefas leves**. Escolha **ULTRA** no menu de energia do GNOME, aprove com uma nova leitura da digital e veja o ícone da bateria ficar amarelo. Volte aos perfis normais a qualquer momento.
+Um modo de economia dedicado a **Brave, terminal e tarefas leves**. Escolha **ULTRA** no menu de energia do GNOME, confirme pela digital ou pelo botão vermelho **OK** e veja o ícone da bateria ficar amarelo. Volte aos perfis normais a qualquer momento.
 
 A ideia é aceitar um computador menos potente para reduzir o consumo. O ganho depende da bateria, do firmware e da carga real; esta versão não promete uma quantidade de horas.
 
-**[Baixar v1.0.0](https://github.com/vcanonici/gnome-ultra-power/releases/tag/v1.0.0)** · **[Recuperação](docs/RECOVERY.md)** · **[Como funciona](docs/ARCHITECTURE.md)** · **[English quick start](docs/README.en.md)**
+**[Baixar v1.1.0](https://github.com/vcanonici/gnome-ultra-power/releases/tag/v1.1.0)** · **[Recuperação](docs/RECOVERY.md)** · **[Como funciona](docs/ARCHITECTURE.md)** · **[English quick start](docs/README.en.md)**
 
 <p align="center"><img src="docs/assets/ultra-active.png" alt="ULTRA ativo no menu de energia com bateria amarela" width="760"></p>
 <p align="center"><em>Captura real da VM de validação; bateria e leitor simulados.</em></p>
@@ -44,7 +44,7 @@ Por padrão, **CPUs continuam online** e **containers/VMs continuam rodando**. A
 | Outras CPUs Intel / AMD | Topologia detectada; cobertura por testes, sem validação física em todos os modelos |
 | GNOME 47–51, KDE, Xorg, outras distribuições | Não suportados nesta release; pré-verificação recusa a instalação |
 
-Precisa de **bateria detectada pelo UPower**, sessão local desbloqueada e **leitor compatível com fprintd com digital cadastrada**. Se a sua máquina não tem leitor, a v1 não poderá ativar ULTRA.
+Precisa de **bateria detectada pelo UPower** e sessão local desbloqueada. Um leitor fprintd com digital cadastrada habilita a opção de confirmar por digital; sem leitor ou cadastro, use o **OK vermelho**.
 
 TLP, tuned, auto-cpufreq e o controlador piloto ThinkPad não podem estar ativos junto deste coordenador. O instalador recusa o conflito; escolha conscientemente qual gerenciamento manter.
 
@@ -54,19 +54,19 @@ Na sessão do usuário que utilizará ULTRA, confirme os requisitos. Se faltarem
 
 ```bash
 sudo apt install python3-dbus python3-gi fprintd libpam-fprintd power-profiles-daemon
-fprintd-enroll
+fprintd-enroll  # opcional: para usar a aprovação por digital
 ```
 
-`fprintd-enroll` cadastra uma digital pelo serviço existente. Faça isso sem sudo. O instalador adiciona apenas o serviço PAM próprio `ultra-power`; não modifica o PAM do login gráfico ou do sudo.
+`fprintd-enroll` é opcional e cadastra uma digital pelo serviço existente. Faça isso sem sudo. O instalador adiciona apenas o serviço PAM próprio `ultra-power`; não modifica o PAM do login gráfico ou do sudo.
 
 Baixe **o pacote completo** e os checksums da release:
 
 ```bash
-curl -fLO https://github.com/vcanonici/gnome-ultra-power/releases/download/v1.0.0/gnome-ultra-power-1.0.0.tar.gz
-curl -fLO https://github.com/vcanonici/gnome-ultra-power/releases/download/v1.0.0/SHA256SUMS
+curl -fLO https://github.com/vcanonici/gnome-ultra-power/releases/download/v1.1.0/gnome-ultra-power-1.1.0.tar.gz
+curl -fLO https://github.com/vcanonici/gnome-ultra-power/releases/download/v1.1.0/SHA256SUMS
 sha256sum --check --ignore-missing SHA256SUMS
-tar -xzf gnome-ultra-power-1.0.0.tar.gz
-cd gnome-ultra-power-1.0.0
+tar -xzf gnome-ultra-power-1.1.0.tar.gz
+cd gnome-ultra-power-1.1.0
 sudo /usr/bin/python3 scripts/install.py doctor --user "$USER"
 sudo /usr/bin/python3 scripts/install.py install --user "$USER"
 ```
@@ -77,11 +77,13 @@ Interrompa se a verificação do checksum falhar. `doctor` faz leitura e não in
 
 O ZIP da extensão é um componente separado para inspeção/desenvolvimento: sozinho não instala o serviço privilegiado. Use o `.tar.gz` para instalação completa.
 
+<p align="center"><img src="docs/assets/confirmation.png" alt="Confirmação com as opções Usar digital e OK vermelho" width="760"></p>
+
 ## Usar
 
 1. Desconecte o carregador e abra o menu de energia nas Configurações Rápidas.
-2. Escolha **ULTRA**. A janela explica os compromissos antes da leitura da digital.
-3. Coloque o dedo cadastrado no leitor. Cada ativação exige uma nova aprovação.
+2. Escolha **ULTRA**. A janela explica os compromissos e oferece **Usar digital** ou **OK** vermelho.
+3. Use uma dessas confirmações. A digital ajuda a evitar falhas de operação por ativação acidental; o OK vermelho permite aceitar conscientemente sem biometria.
 4. O ícone amarelo confirma ULTRA ativo. O menu informa se a NVIDIA permanece acordada.
 5. Escolha **ULTRA: mais fluidez** se precisar, ou selecione um perfil normal para sair.
 
@@ -93,7 +95,7 @@ ultra-power responsive  # mais fluidez, enquanto ativo
 ultra-power off         # sair e recuperar ajustes
 ```
 
-Não há comando de ativação que dispense a digital. O modo não persiste após reinício; a regra dos perfis ao conectar/desconectar o carregador permanece enquanto o serviço estiver instalado.
+A confirmação pela digital ou pelo OK é uma escolha do usuário; não se guarda uma aprovação para ativar automaticamente depois. O clique confirma os compromissos. As verificações de sessão, hardware, processos e recuperação continuam no serviço. O modo não persiste após reinício; a regra dos perfis ao conectar/desconectar o carregador permanece enquanto o serviço estiver instalado.
 
 ## Opções para quem aceita mais restrições
 

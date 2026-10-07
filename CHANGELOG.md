@@ -1,5 +1,15 @@
 # Histórico
 
+## 1.1.0 — 2026-10-07
+
+- Confirmação alternativa pelo botão vermelho OK, equivalente à escolha da digital.
+- Explicação do objetivo: evitar falhas de operação por ativação acidental.
+- Digital começa somente ao escolher Usar digital; falha permite tentar novamente ou usar OK.
+- Mesmas verificações de UID, sessão, bateria, processos protegidos e journal para ambos os caminhos.
+- Instalação permitida sem digital cadastrada; leitores continuam opcionais para aprovação biométrica.
+- Evita autoativação D-Bus e espera por Bluetooth ausente.
+- 51 testes e mypy strict; teste gráfico do botão e de troca de aprovação na VM.
+
 ## 1.0.0 — 2026-10-07
 
 - Primeira distribuição pública independente do modo ULTRA.

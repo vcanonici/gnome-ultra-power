@@ -29,9 +29,9 @@ A recuperação usa o journal privado, valida os caminhos e retém o arquivo se 
 ## Perguntas comuns
 
 - **ULTRA não aparece:** confirme GNOME 46 e sessão Wayland, saia/entre, consulte `gnome-extensions info ultra-power@vcanonici` e `systemctl status ultra-power`.
-- **Digital falha:** confirme `fprintd-list "$USER"` e verifique se outro programa está usando o leitor. A v1 não substitui falha de biometria por senha.
+- **Digital falha:** confirme `fprintd-list "$USER"` e verifique se outro programa está usando o leitor. Você pode tentar novamente ou usar a alternativa OK vermelho.
 - **GPU ativa:** ULTRA já está funcionando com economia parcial. Verifique cargas CUDA, programas em offload e saídas externas; o modo nunca mata o compositor.
-- **Sem leitor:** a v1 exige fprintd e digital cadastrada.
+- **Sem leitor:** use o OK vermelho; o cadastro só é necessário para a opção de digital.
 - **Preciso manter acesso remoto:** ULTRA pausa o GNOME Remote Desktop do usuário; escolha um perfil normal para retomá-lo. Acesso remoto não pode aprovar a ativação.
 - **Já uso TLP/tuned:** o instalador recusa dois coordenadores ativos. Não desative ferramentas existentes sem decidir qual política quer manter.
 - **A sessão ficou lenta:** use “mais fluidez” ou saia do ULTRA. As restrições são intencionais e abrangem todas as aplicações da conta.

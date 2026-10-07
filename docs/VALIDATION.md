@@ -1,10 +1,10 @@
-# Validação da v1.0.0
+# Validação da v1.1.0
 
 Data: 2026-10-07. Esta lista distingue testes do pacote público e a referência física do controlador original.
 
 ## Pacote público
 
-- **42 testes**: configuração estrita, descoberta de topologia híbrida/SMT/um núcleo e IDs diferentes, recuperação, proteção de processos, revisão de PID/pidfd, cpufreq inativa/EBUSY e instalador.
+- **51 testes**: configuração estrita, descoberta de topologia híbrida/SMT/um núcleo e IDs diferentes, recuperação, proteção de processos, revisão de PID/pidfd, cpufreq inativa/EBUSY e instalador.
 - **mypy strict** aprovado em nove arquivos Python, com stubs para D-Bus.
 - Sintaxe ESModule da extensão, metadata JSON e unidade systemd verificadas.
 - Regressão de permissão: biblioteca legível pela sessão (0755) e módulos 0644 mesmo com umask 077; manifesto privado 0700.
@@ -20,7 +20,7 @@ Conta gráfica UID **1001**, diferente do UID1000 habitual; quatro CPUs virtuais
 | Cancelar / digital rejeitada | Nenhum ajuste aplicado |
 | Digital aprovada, padrão | Afinidade 1–2; quatro CPUs continuam online |
 | Mais fluidez / saída | Afinidade ampliada e baseline restaurado |
-| Nova ativação | Nova digital exigida |
+| Nova tentativa pela digital | Nova leitura exigida |
 | Hotplug opt-in | Online 0–2, afinidade 1–2; fluidez/saída restauram 0–3 |
 | Menu nativo | ULTRA visível, check e bateria amarela; “Sem GPU NVIDIA dedicada” |
 | SIGKILL do serviço ativo | systemd executou recuperação/reinício; journal eliminado, afinidade restaurada, ULTRA inativo |
@@ -40,3 +40,11 @@ ThinkPad T15p: o operador confirmou ativação com digital real e ícone amarelo
 ## Limites
 
 Sem benchmark comparativo de horas de bateria ou consumo em watts na distribuição pública. Sem suporte declarado a GNOME diferente de 46, outras distribuições ou Xorg. Bluetooth, brilho, EPP e teclado variam com hardware. CI verifica código/empacotamento; testes físicos continuam necessários para ampliar a matriz.
+
+## Confirmação alternativa da v1.1.0
+
+O OK vermelho confirma conscientemente os compromissos, como alternativa à digital. A finalidade é evitar falhas de operação por ativação acidental, enquanto as verificações técnicas e o rollback permanecem no serviço. O OK não é um segundo fator; consulte SECURITY.md.
+
+Oito testes adicionais verificam confirmação sem PAM, recusa com AC/sessão bloqueada/root/outro UID, proteção de processos, revalidação de identidade, troca da própria aprovação pendente e recusa de troca da aprovação de outro cliente ou recuperação pendente.
+
+Na VM, o diagnóstico aceitou ausência de cadastro, a falha da digital conservou o OK vermelho, e o clique ativou ULTRA sem biometria. A troca de uma leitura pendente para OK cancelou o worker PAM e ativou em menos de um segundo; saída restaurou o baseline. O teste por digital da v1.0 foi repetido na v1.1 com sucesso. Bluetooth sem owner D-Bus não é autoativado; isso removeu uma espera de 25 segundos da fixture.

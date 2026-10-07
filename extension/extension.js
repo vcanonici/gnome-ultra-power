@@ -12,6 +12,7 @@ const NAME = 'io.github.vcanonici.UltraPower';
 const XML = `<node><interface name="${NAME}">
 <method name="GetBlockers"><arg type="a(ssb)" direction="out"/></method>
 <method name="RequestEnable"><arg type="b" direction="in"/><arg type="as" direction="in"/></method>
+<method name="ConfirmEnable"><arg type="b" direction="in"/><arg type="as" direction="in"/></method>
 <method name="Cancel"/><method name="Disable"><arg type="s" direction="in"/></method>
 <method name="SetPreset"><arg type="s" direction="in"/></method>
 <property name="Active" type="b" access="read"/><property name="Pending" type="b" access="read"/>
@@ -145,10 +146,13 @@ export default class Ultra extends Extension {
     _changed() {
         this._toggle._sync();
         if (!this._proxy.g_name_owner) { this._closeDialog(); return; }
-        if (this._proxy.Applying && this._dialog)
+        if (this._proxy.Applying && this._dialog) {
             this._body.text = 'Aplicando os ajustes. Aguarde…';
+            this._approval?.digital?.set_reactive(false);
+            this._approval?.ok?.set_reactive(false);
+        }
         else if (this._proxy.Pending && this._dialog)
-            this._body.text = 'CPU reduzida, tela até 20% quando disponível, retroiluminação no nível mínimo quando disponível. Acesso remoto e indexação serão pausados; VPNs serão preservadas.\n\n' + (this._proxy.ApprovalMessage || 'Coloque o indicador no leitor de impressão digital.');
+            this._body.text = 'CPU reduzida, tela até 20% quando disponível, retroiluminação no nível mínimo quando disponível. Acesso remoto e indexação serão pausados; VPNs serão preservadas.\n\n' + 'A confirmação evita ativação acidental. Use o dedo cadastrado ou clique no OK vermelho.';
         else if (this._proxy.Active) {
             const completed = Boolean(this._dialog);
             this._closeDialog();
@@ -157,7 +161,11 @@ export default class Ultra extends Extension {
         }
         else if (this._proxy.LastError && this._proxy.LastError !== this._lastError) {
             this._lastError = this._proxy.LastError;
-            this._closeDialog(); this._showError(this._lastError);
+            if (this._approval && this._dialog) {
+                this._body.text = this._lastError + '\n\nVocê pode tentar a digital novamente ou confirmar no OK vermelho.';
+                this._approval.digital.set_reactive(true);
+                this._approval.ok.set_reactive(true);
+            } else { this._closeDialog(); this._showError(this._lastError); }
         }
     }
     _dialogBox(title, body) {
@@ -175,6 +183,7 @@ export default class Ultra extends Extension {
         return this._dialog;
     }
     _closeDialog() {
+        this._approval = null;
         if (this._dialog) { const dialog = this._dialog; this._dialog = null; this._body = null; dialog.close(); }
     }
     _showError(message) {
@@ -192,7 +201,7 @@ export default class Ultra extends Extension {
                 const names = rows.map(row => `${row[1]} (PID ${row[0].split(':')[0]})`).join('\n');
                 const killable = rows.every(row => row[2]);
                 const dialog = this._dialogBox('Processos com acesso à NVIDIA',
-                    `${names}\n\nVocê pode continuar com economia parcial e manter estes processos. A NVIDIA poderá continuar ligada. ${killable ? 'Encerrar à força pode perder trabalho não salvo.' : 'Processos protegidos serão preservados.'} A digital será exigida para ativar.`);
+                    `${names}\n\nVocê pode continuar com economia parcial e manter estes processos. A NVIDIA poderá continuar ligada. ${killable ? 'Encerrar à força pode perder trabalho não salvo.' : 'Processos protegidos serão preservados.'} A ativação exige confirmação pela digital ou OK vermelho.`);
                 const buttons = [{label: 'Cancelar', action: () => this._closeDialog(), key: Clutter.KEY_Escape}];
                 buttons.push({label: 'Continuar com economia parcial', action: () => this._approve(false, [])});
                 if (killable) buttons.push({label: 'Encerrar à força e continuar', action: () => this._approve(true, rows.map(row => row[0]))});
@@ -202,13 +211,24 @@ export default class Ultra extends Extension {
     }
     _approve(force, reviewed) {
         this._lastError = '';
-        const dialog = this._dialogBox('Ativar ULTRA',
-            'CPU reduzida, brilho até 20% quando disponível, retroiluminação no nível mínimo quando disponível. Acesso remoto e indexação serão pausados; VPNs serão preservadas. Se a NVIDIA continuar ligada, o ULTRA manterá economia parcial com aviso.\n\nColoque o indicador no leitor de impressão digital.');
+        const dialog = this._dialogBox('Confirmar ULTRA',
+            'CPU reduzida, brilho até 20% e retroiluminação mínima quando disponíveis. Acesso remoto e indexação serão pausados; VPNs serão preservadas.\n\nA digital ajuda a evitar falhas de operação por ativação acidental. Você também pode confirmar clicando no OK vermelho. As verificações do sistema e a recuperação continuam automáticas.');
         dialog.setButtons([{label: 'Cancelar', action: () => {
             this._call('Cancel'); this._closeDialog();
         }, key: Clutter.KEY_Escape}]);
+        const digital = dialog.addButton({label: 'Usar digital', action: () => {
+            digital.set_reactive(false);
+            this._lastError = '';
+            this._body.text = 'Coloque o dedo cadastrado no leitor. Para evitar ativação acidental, confirme com a digital ou clique no OK vermelho.';
+            this._call('RequestEnable', [force, reviewed]);
+        }});
+        const ok = dialog.addButton({label: 'OK', action: () => {
+            digital.set_reactive(false); ok.set_reactive(false);
+            this._call('ConfirmEnable', [force, reviewed]);
+        }});
+        ok.add_style_class_name('ultra-approve-ok');
+        this._approval = {digital, ok};
         dialog.open();
-        this._call('RequestEnable', [force, reviewed]);
     }
     disable() {
         this._call('Cancel');

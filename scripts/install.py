@@ -123,8 +123,7 @@ def doctor(user: pwd.struct_passwd, offline: bool, containers: bool) -> Report:
         raise ValueError("Bateria de portátil não detectada pelo UPower.")
     fingers = subprocess.run(["fprintd-list", user.pw_name], capture_output=True, text=True,
                              timeout=10, env={**os.environ, "LC_ALL": "C"})
-    if fingers.returncode or not re.search(r"(?m)^\s*-[ ]*#[0-9]+:", fingers.stdout):
-        raise ValueError("Cadastre uma digital primeiro: fprintd-enroll (sem sudo).")
+    enrolled = not fingers.returncode and bool(re.search(r"(?m)^\s*-[ ]*#[0-9]+:", fingers.stdout))
     # Do not install a second coordinator beside the host-specific pilot/TLP.
     for unit in ("thinkpad-power-ac", "tlp", "tuned", "auto-cpufreq"):
         if subprocess.run(["systemctl", "is-active", unit], capture_output=True).returncode == 0:
@@ -134,7 +133,7 @@ def doctor(user: pwd.struct_passwd, offline: bool, containers: bool) -> Report:
         if offline and cpu != 0 and not Path(f"/sys/devices/system/cpu/cpu{cpu}/online").exists():
             raise ValueError("Topologia sem suporte a CPU hotplug.")
     return {"supported": True, "gnome": "46", "config": profile,
-            "digital": "cadastrada", "vpn": "preservada",
+            "digital": "cadastrada; alternativa OK vermelho" if enrolled else "não cadastrada; OK vermelho disponível", "vpn": "preservada",
             "installation": "afinidade de CPU" if not offline else "hotplug explícito"}
 
 
@@ -245,7 +244,7 @@ def install(user: pwd.struct_passwd, report: Report) -> None:
         run("systemctl", "daemon-reload")
         run("systemctl", "enable", "--now", UNIT)
         if pam_hashes() != manifest["pam_hashes"]: raise ValueError("PAM gráfico/sudo mudou!")
-        print("Instalado. Salve seu trabalho e saia/entre na sessão; ULTRA só ativa pela digital, na bateria.")
+        print("Instalado. Salve seu trabalho e saia/entre na sessão; na bateria, confirme ULTRA pela digital ou OK vermelho.")
     except Exception:
         # Always attempt rollback; a failed recovery keeps its private manifest.
         try: remove()
