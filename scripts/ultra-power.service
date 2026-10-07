@@ -1,0 +1,23 @@
+[Unit]
+Description=GNOME ULTRA Power — bateria com aprovação digital
+After=upower.service power-profiles-daemon.service
+Wants=upower.service power-profiles-daemon.service
+
+[Service]
+Type=dbus
+BusName=io.github.vcanonici.UltraPower
+ExecStart=/usr/bin/python3 /usr/local/lib/ultra-power/daemon.py
+ExecStopPost=/usr/bin/python3 /usr/local/lib/ultra-power/daemon.py restore
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=90
+StateDirectory=ultra-power
+StateDirectoryMode=0700
+RuntimeDirectory=ultra-power
+RuntimeDirectoryMode=0700
+ProtectSystem=full
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+
+[Install]
+WantedBy=multi-user.target

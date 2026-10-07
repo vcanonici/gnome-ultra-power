@@ -1,0 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#panel .panel-button .system-status-icon.ultra-active, #panel .panel-button:hover .system-status-icon.ultra-active { color: #F9C440; }
+.ultra-dialog-title { font-size: 1.3em; font-weight: bold; }
+.ultra-dialog-body { max-width: 34em; }
+.ultra-dialog-icon { icon-size: 64px; margin-bottom: 16px; }

@@ -1,0 +1,2 @@
+auth requisite pam_fprintd.so max-tries=3 timeout=20
+account required pam_unix.so

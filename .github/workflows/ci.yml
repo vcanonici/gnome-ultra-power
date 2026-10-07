@@ -1,0 +1,24 @@
+name: Checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-dbus python3-gi python3-venv
+          python3 -m venv --system-site-packages .venv
+          .venv/bin/pip install mypy==1.18.2
+      - name: Tests, strict types and extension syntax
+        run: PATH="$PWD/.venv/bin:$PATH" bash scripts/check.sh
+      - name: Build and verify release archives
+        run: |
+          python3 scripts/build-release.py
+          cd artifacts
+          sha256sum --check SHA256SUMS

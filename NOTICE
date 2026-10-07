@@ -1,0 +1,8 @@
+GNOME ULTRA Power
+Copyright (C) 2026 vcanonici
+SPDX-License-Identifier: GPL-3.0-or-later
+
+Original controller and extension developed for a ThinkPad T15p;
+this distribution generalizes hardware discovery and adds a scoped installer.
+GNOME, Ubuntu, Lenovo, NVIDIA and Brave are trademarks of their owners.
+No affiliation or endorsement is implied.
